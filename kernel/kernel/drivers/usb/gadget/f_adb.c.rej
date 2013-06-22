@@ -1,0 +1,30 @@
+--- drivers/usb/gadget/f_adb.c
++++ drivers/usb/gadget/f_adb.c
+@@ -461,7 +467,8 @@
+ 	/* clear the error latch */
+ 	_adb_dev->error = 0;
+ 
+-	adb_ready_callback();
++	if (!cancel_delayed_work_sync(&_adb_dev->adb_release_w))
++		adb_ready_callback();
+ 
+ 	return 0;
+ }
+@@ -470,7 +477,16 @@
+ {
+ 	pr_info("adb_release\n");
+ 
+-	adb_closed_callback();
++	/*
++	 * When USB cable is plugged out, adb reader is unblocked and
++	 * -EIO is returned to user space. adb daemon reopen the port
++	 * which would disable and enable USB configuration unnecessarily.
++	 *
++	 * Delay notifying the adb close event to android by 1 sec. If
++	 * ADB daemon opens the port with in 1 sec, USB configuration
++	 * re-enable does not happen.
++	 */
++	schedule_delayed_work(&_adb_dev->adb_release_w, msecs_to_jiffies(1000));
+ 
+ 	adb_unlock(&_adb_dev->open_excl);
+ 	return 0;
