@@ -1,0 +1,17 @@
+--- fs/dyn_sync_cntrl.c
++++ fs/dyn_sync_cntrl.c
+@@ -20,11 +20,12 @@
+ #include <linux/sysfs.h>
+ #include <linux/earlysuspend.h>
+ #include <linux/mutex.h>
+-
++#include <linux/notifier.h>
++#include <linux/reboot.h>
+ #include <linux/writeback.h>
+ 
+ #define DYN_FSYNC_VERSION_MAJOR 1
+-#define DYN_FSYNC_VERSION_MINOR 1
++#define DYN_FSYNC_VERSION_MINOR 2
+ 
+ /*
+  * fsync_mutex protects dyn_fsync_active during early suspend / late resume
