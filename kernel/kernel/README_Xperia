@@ -4,6 +4,7 @@ Xperia P => riogrande_nypon_defconfig
 Xperia Go => riogrande_lotus_defconfig
 
 
+
 To flash your kernel using Fastboot perform the following steps:
 
 1) Assemble the kernel image:
