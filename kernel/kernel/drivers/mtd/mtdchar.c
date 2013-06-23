@@ -1076,8 +1076,8 @@ static int mtd_mmap(struct file *file, struct vm_area_struct *vma)
 	unsigned long off;
 	u32 len;
 
-	if (mtd->type == MTD_RAM || mtd->type == MTD_ROM) {
-		off = vma->vm_pgoff << PAGE_SHIFT;
+	if (0) {
+/*		off = vma->vm_pgoff << PAGE_SHIFT;
 		start = map->phys;
 		len = PAGE_ALIGN((start & ~PAGE_MASK) + map->size);
 		start &= PAGE_MASK;
@@ -1087,17 +1087,12 @@ static int mtd_mmap(struct file *file, struct vm_area_struct *vma)
 		off += start;
 		vma->vm_pgoff = off >> PAGE_SHIFT;
 		vma->vm_flags |= VM_IO | VM_RESERVED;
-
+*/
 #ifdef pgprot_noncached
-		if (file->f_flags & O_DSYNC || off >= __pa(high_memory))
+		iif (file->f_flags & O_DSYNC || map->phys >= __pa(high_memory))
 			vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 #endif
-		if (io_remap_pfn_range(vma, vma->vm_start, off >> PAGE_SHIFT,
-				       vma->vm_end - vma->vm_start,
-				       vma->vm_page_prot))
-			return -EAGAIN;
-
-		return 0;
+		return vm_iomap_memory(vma, map->phys, map->size);
 	}
 	return -ENOSYS;
 #else
