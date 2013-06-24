@@ -1115,7 +1115,8 @@ static int sas_check_ex_subtractive_boundary(struct domain_device *dev)
 			}
 		}
 	}
-	return 0;
+out:
+	return res;
 }
 
 static void sas_print_parent_topology_bug(struct domain_device *child,
