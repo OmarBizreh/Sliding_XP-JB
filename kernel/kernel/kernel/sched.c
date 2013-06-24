@@ -3508,6 +3508,8 @@ void calc_global_load(unsigned long ticks)
 
 	calc_global_nohz(ticks);
 
+	calc_global_nohz(ticks);
+
 	if (time_before(jiffies, calc_load_update + 10))
 		return;
 
