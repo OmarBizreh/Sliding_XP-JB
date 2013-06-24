@@ -1,0 +1,49 @@
+--- drivers/usb/gadget/android.c
++++ drivers/usb/gadget/android.c
+@@ -118,6 +122,7 @@
+ 	struct device *dev;
+ 
+ 	bool enabled;
++    int disable_depth;
+ 	struct mutex mutex;
+ 	bool connected;
+ 	bool sw_connected;
+@@ -1255,9 +1352,11 @@
+ 				cdev->desc.bDeviceProtocol);
+ 		printk(KERN_DEBUG "usb: %s next cmd : usb_add_config\n",
+ 				__func__);
+-		usb_add_config(cdev, &android_config_driver,
+-					android_bind_config);
+-		usb_gadget_connect(cdev->gadget);
++		list_for_each_entry(f, &dev->enabled_functions, enabled_list) {
++			if (f->enable)
++				f->enable(f);
++		}
++		android_enable(dev);
+ 		dev->enabled = true;
+ 	} else if (!enabled && dev->enabled) {
+ #ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
+@@ -1266,10 +1365,11 @@
+ 		 */
+ 		cdev->mute_switch = true;
+ #endif
+-		usb_gadget_disconnect(cdev->gadget);
+-		/* Cancel pending control requests */
+-		usb_ep_dequeue(cdev->gadget->ep0, cdev->req);
+-		usb_remove_config(cdev, &android_config_driver);
++		android_disable(dev);
++		list_for_each_entry(f, &dev->enabled_functions, enabled_list) {
++			if (f->disable)
++				f->disable(f);
++		}
+ 		dev->enabled = false;
+ 		mdelay(5);
+ 	} else if (!enabled) {
+@@ -1635,6 +1735,7 @@
+ 	if (!dev)
+ 		return -ENOMEM;
+ 
++    dev->disable_depth = 1;
+ 	if(!romtype) dev->functions = supported3sung_functions;
+ 	else dev->functions = supported_functions;
+ 	INIT_LIST_HEAD(&dev->enabled_functions);
