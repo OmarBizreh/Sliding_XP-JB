@@ -1,0 +1,17 @@
+--- arch/x86/kvm/x86.c
++++ arch/x86/kvm/x86.c
+@@ -1531,12 +1532,9 @@
+ 
+ 		gpa_offset = data & ~(PAGE_MASK | 1);
+ 
+-		/* Check that the address is 32-byte aligned. */
+-		if (gpa_offset & (sizeof(struct pvclock_vcpu_time_info) - 1))
+-			break;
+-
+ 		if (kvm_gfn_to_hva_cache_init(vcpu->kvm,
+-		     &vcpu->arch.pv_time, data & ~1ULL))
++		     &vcpu->arch.pv_time, data & ~1ULL,
++		     sizeof(struct pvclock_vcpu_time_info)))
+ 			vcpu->arch.pv_time_enabled = false;
+ 		else
+ 			vcpu->arch.pv_time_enabled = true;
