@@ -1,0 +1,12 @@
+--- net/caif/caif_dev.c
++++ net/caif/caif_dev.c
+@@ -209,8 +209,7 @@
+ 	enum cfcnfg_phy_preference pref;
+ 	enum cfcnfg_phy_type phy_type;
+ 	struct cfcnfg *cfg;
+-	struct caif_device_entry_list *caifdevs =
+-	    caif_device_list(dev_net(dev));
++	struct caif_device_entry_list *caifdevs;
+ 
+ 	if (dev->type != ARPHRD_CAIF)
+ 		return 0;

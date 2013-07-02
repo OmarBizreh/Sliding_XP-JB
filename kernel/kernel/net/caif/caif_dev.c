@@ -224,6 +224,8 @@ static int caif_device_notify(struct notifier_block *me, unsigned long what,
 
 	caifdevs = caif_device_list(dev_net(dev));
 
+	caifdevs = caif_device_list(dev_net(dev));
+
 	switch (what) {
 	case NETDEV_REGISTER:
 		caifd = caif_device_alloc(dev);
