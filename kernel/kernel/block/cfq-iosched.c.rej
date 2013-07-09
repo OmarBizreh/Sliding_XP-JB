@@ -1,0 +1,45 @@
+--- block/cfq-iosched.c
++++ block/cfq-iosched.c
+@@ -3169,7 +3169,7 @@
+ 		}
+ 	}
+ 
+-	if (ret)
++	if (ret && ret != -EEXIST)
+ 		printk(KERN_ERR "cfq: cic link failed!\n");
+ 
+ 	return ret;
+@@ -3193,6 +3194,7 @@
+ 	if (!ioc)
+ 		return NULL;
+ 
++retry:
+ 	cic = cfq_cic_lookup(cfqd, ioc);
+ 	if (cic)
+ 		goto out;
+@@ -3201,7 +3203,12 @@
+ 	if (cic == NULL)
+ 		goto err;
+ 
+-	if (cfq_cic_link(cfqd, ioc, cic, gfp_mask))
++	ret = cfq_cic_link(cfqd, ioc, cic, gfp_mask);
++	if (ret == -EEXIST) {
++		/* someone has linked cic to ioc already */
++		cfq_cic_free(cic);
++		goto retry;
++	} else if (ret)
+ 		goto err_free;
+ 
+ out:
+@@ -4016,6 +4023,11 @@
+ 
+ 	if (blkio_alloc_blkg_stats(&cfqg->blkg)) {
+ 		kfree(cfqg);
++
++		spin_lock(&cic_index_lock);
++		ida_remove(&cic_index_ida, cfqd->cic_index);
++		spin_unlock(&cic_index_lock);
++
+ 		kfree(cfqd);
+ 		return NULL;
+ 	}
