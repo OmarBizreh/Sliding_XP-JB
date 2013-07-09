@@ -226,6 +226,11 @@ struct mm_struct *mm_for_maps(struct task_struct *task)
 	return mm_access(task, PTRACE_MODE_READ);
 }
 
+struct mm_struct *mm_for_maps(struct task_struct *task)
+{
+	return mm_access(task, PTRACE_MODE_READ);
+}
+
 static int proc_pid_cmdline(struct task_struct *task, char * buffer)
 {
 	int res = 0;
