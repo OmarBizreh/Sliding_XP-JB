@@ -2046,6 +2046,10 @@ pl011_console_write(struct console *co, const char *s, unsigned int count)
 		spin_unlock(&uap->port.lock);
 	local_irq_restore(flags);
 
+	if (locked)
+		spin_unlock(&uap->port.lock);
+	local_irq_restore(flags);
+
 	clk_disable(uap->clk);
 }
 
