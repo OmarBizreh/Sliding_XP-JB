@@ -561,6 +561,9 @@ static void chase_port(struct edgeport_port *port, unsigned long timeout,
 	if (!tty)
 		return;
 
+	if (!tty)
+		return;
+
 	if (!timeout)
 		timeout = (HZ * EDGE_CLOSING_WAIT)/100;
 
